@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Карта Байкала - бережный цифровой ориентир для знакомства с регионом.">
+  <title>Карта Байкала</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #647184;
+      --line: rgba(23, 33, 43, 0.14);
+      --paper: #f7f5ef;
+      --mist: #e7eef0;
+      --lake: #1f6f78;
+      --pine: #244b3f;
+      --sun: #d99848;
+      --white: #ffffff;
+      --shadow: 0 24px 60px rgba(17, 42, 52, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, Manrope, "Segoe UI", Arial, sans-serif;
+      background: var(--paper);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .hero {
+      min-height: 92vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      color: var(--white);
+      background: #17363f;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(12, 32, 39, 0.88), rgba(12, 32, 39, 0.48) 52%, rgba(12, 32, 39, 0.22)),
+        linear-gradient(180deg, rgba(12, 32, 39, 0.15), rgba(12, 32, 39, 0.62)),
+        url("../assets/baikal.jpg") center / cover no-repeat;
+      transform: scale(1.02);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 120px;
+      background: linear-gradient(180deg, rgba(247, 245, 239, 0), var(--paper));
+    }
+
+    .nav {
+      width: min(1120px, calc(100% - 40px));
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transform: translateX(-50%);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      font-size: 18px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.86);
+    }
+
+    .nav-links a {
+      padding: 8px 0;
+    }
+
+    .hero-inner {
+      width: min(1120px, calc(100% - 40px));
+      position: relative;
+      z-index: 1;
+      margin: 0 auto;
+      padding: 120px 0 96px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 2px;
+      background: var(--sun);
+    }
+
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(44px, 7vw, 92px);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 610px;
+      margin: 26px 0 34px;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: clamp(18px, 2.2vw, 23px);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 13px 22px;
+      border-radius: 8px;
+      font-weight: 800;
+      transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .button-primary {
+      color: #17212b;
+      background: var(--sun);
+    }
+
+    .button-secondary {
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.10);
+      backdrop-filter: blur(10px);
+    }
+
+    main {
+      position: relative;
+      z-index: 2;
+    }
+
+    .section {
+      padding: 88px 0;
+    }
+
+    .section.alt {
+      background: var(--mist);
+    }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .section-header {
+      max-width: 720px;
+      margin-bottom: 42px;
+    }
+
+    .section-label {
+      margin: 0 0 10px;
+      color: var(--lake);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 52px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .section-copy {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      min-height: 230px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.66);
+      box-shadow: 0 16px 38px rgba(23, 33, 43, 0.07);
+    }
+
+    .card-number {
+      color: var(--sun);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .card h3 {
+      margin: 28px 0 12px;
+      font-size: 23px;
+      line-height: 1.16;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .story {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 54px;
+      align-items: center;
+    }
+
+    .story-media {
+      min-height: 460px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(31, 111, 120, 0.12), rgba(36, 75, 63, 0.2)),
+        url("../assets/baikal.jpg") center / cover no-repeat;
+      box-shadow: var(--shadow);
+    }
+
+    .points {
+      display: grid;
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .point {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .point-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--white);
+      background: var(--pine);
+      font-weight: 900;
+    }
+
+    .point h3 {
+      margin: 0 0 4px;
+      font-size: 18px;
+    }
+
+    .point p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metric {
+      padding: 28px 24px;
+      border-right: 1px solid var(--line);
+    }
+
+    .metric:last-child {
+      border-right: 0;
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--lake);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .contact {
+      display: grid;
+      grid-template-columns: 1fr 0.8fr;
+      gap: 42px;
+      align-items: start;
+    }
+
+    .contact-box {
+      padding: 34px;
+      border-radius: 8px;
+      color: var(--white);
+      background: var(--pine);
+      box-shadow: var(--shadow);
+    }
+
+    .contact-box p {
+      margin: 0 0 22px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .contact-line {
+      display: block;
+      padding: 14px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.22);
+      font-weight: 800;
+    }
+
+    footer {
+      padding: 30px 0;
+      color: var(--muted);
+      background: #eef1ec;
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      width: min(1120px, calc(100% - 40px));
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 860px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: 86vh;
+      }
+
+      .hero-inner {
+        padding-top: 110px;
+      }
+
+      .grid,
+      .story,
+      .strip,
+      .contact {
+        grid-template-columns: 1fr;
+      }
+
+      .story-media {
+        min-height: 320px;
+      }
+
+      .metric {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .metric:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .hero::before {
+        background:
+          linear-gradient(90deg, rgba(12, 32, 39, 0.9), rgba(12, 32, 39, 0.46)),
+          linear-gradient(180deg, rgba(12, 32, 39, 0.18), rgba(12, 32, 39, 0.68)),
+          url("../assets/baikal.jpg") center / cover no-repeat;
+      }
+
+      .section {
+        padding: 64px 0;
+      }
+
+      .actions,
+      .button {
+        width: 100%;
+      }
+
+      .card,
+      .contact-box {
+        padding: 24px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <nav class="nav" aria-label="Основная навигация">
+      <a class="brand" href="#top" aria-label="Карта Байкала">
+        <span class="brand-mark">Б</span>
+        <span>Карта Байкала</span>
+      </a>
+      <div class="nav-links">
+        <a href="#about">О проекте</a>
+        <a href="#value">Подход</a>
+        <a href="#contact">Связаться</a>
+      </div>
+    </nav>
+
+    <div class="hero-inner" id="top">
+      <p class="eyebrow">Бережный ориентир по региону</p>
+      <h1>Карта Байкала</h1>
+      <p class="lead">
+        Цифровая среда для знакомства с Байкалом, локальными местами и атмосферой региона.
+        Проект помогает увидеть главное без лишнего шума и сохранить пространство для личного открытия.
+      </p>
+      <div class="actions">
+        <a class="button button-primary" href="#contact">Обсудить сотрудничество</a>
+        <a class="button button-secondary" href="#about">Узнать больше</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section" id="about">
+      <div class="wrap">
+        <div class="section-header">
+          <p class="section-label">Идея в общих чертах</p>
+          <h2>Про Байкал, людей и места, которые хочется замечать внимательнее</h2>
+          <p class="section-copy">
+            Мы собираем вокруг Байкала понятный цифровой слой: спокойный, визуальный и полезный.
+            Он не заменяет путешествие, а помогает мягко сориентироваться и выбрать свой маршрут впечатлений.
+          </p>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <span class="card-number">01</span>
+            <h3>Открывать регион</h3>
+            <p>Показывать Байкал как живое пространство с природой, культурой, городскими точками и локальными историями.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">02</span>
+            <h3>Поддерживать локальное</h3>
+            <p>Давать заметность местным инициативам и сервисам без перегруза деталями и сложной навигацией.</p>
+          </article>
+          <article class="card">
+            <span class="card-number">03</span>
+            <h3>Сохранять интригу</h3>
+            <p>Рассказывать достаточно, чтобы заинтересовать, но не раскрывать внутреннюю механику проекта заранее.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="value">
+      <div class="wrap story">
+        <div class="story-media" role="img" aria-label="Пейзаж Байкала"></div>
+        <div>
+          <p class="section-label">Подход</p>
+          <h2>Меньше шума, больше ощущения места</h2>
+          <p class="section-copy">
+            Проект строится вокруг доверия, аккуратной подачи и уважения к региону.
+            В центре не технология сама по себе, а простой вопрос: как человеку быстрее почувствовать,
+            что Байкал рядом и он может выбрать свое направление.
+          </p>
+
+          <div class="points">
+            <div class="point">
+              <span class="point-icon">1</span>
+              <div>
+                <h3>Понятная подача</h3>
+                <p>Короткие смыслы, ясная структура и минимум лишних обещаний.</p>
+              </div>
+            </div>
+            <div class="point">
+              <span class="point-icon">2</span>
+              <div>
+                <h3>Локальный фокус</h3>
+                <p>Внимание к месту, людям и событиям без раскрытия закрытой концепции.</p>
+              </div>
+            </div>
+            <div class="point">
+              <span class="point-icon">3</span>
+              <div>
+                <h3>Партнерский формат</h3>
+                <p>Открытость к диалогу с теми, кому близка бережная цифровая среда вокруг Байкала.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="strip" aria-label="Ключевые акценты проекта">
+          <div class="metric">
+            <strong>01</strong>
+            <span>Региональная идентичность</span>
+          </div>
+          <div class="metric">
+            <strong>02</strong>
+            <span>Удобное знакомство</span>
+          </div>
+          <div class="metric">
+            <strong>03</strong>
+            <span>Локальные сценарии</span>
+          </div>
+          <div class="metric">
+            <strong>04</strong>
+            <span>Закрытая детализация</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="contact">
+      <div class="wrap contact">
+        <div>
+          <p class="section-label">Контакт</p>
+          <h2>Расскажем больше тем, кто разделяет подход</h2>
+          <p class="section-copy">
+            Сейчас проект можно обсуждать на уровне партнерства, пилотных форматов и общей синергии.
+            Подробности раскрываются только в личном диалоге.
+          </p>
+        </div>
+        <aside class="contact-box">
+          <p>Для партнеров, локальных команд, представителей туризма, культуры и городских инициатив.</p>
+          <a class="contact-line" href="mailto:hello@karta-baikala.ru">hello@karta-baikala.ru</a>
+          <a class="contact-line" href="tel:+70000000000">+7 000 000 00 00</a>
+          <span class="contact-line">Иркутская область и Республика Бурятия</span>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Карта Байкала</span>
+      <span>Общее описание проекта без раскрытия закрытой концепции</span>
+    </div>
+  </footer>
+</body>
+</html>
